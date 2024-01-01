@@ -26,11 +26,36 @@ userDetails: {
 });
 
 const Slot = mongoose.model('Slot', slotSchema);
-const Appointment = mongoose.model('Appointment', appointmentSchema);
 
 app.use(cors());
 app.use(express.json());
 
+// Routes
+
+//create a new slot
+app.post('/api/slots', async (req, res) => {
+    try {
+        const { startTime, endTime } = req.body;
+        const newSlot = new Slot({ startTime, endTime, isBooked: false });
+        await newSlot.save();
+        res.status(201).json(newSlot);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// get all slots
+app.get('/api/slots', async (req, res) => {
+try {
+    const slots = await Slot.find({ isBooked: false });
+    res.status(200).json(slots);
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
+});
+    
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
